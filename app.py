@@ -4,6 +4,12 @@ from urllib.parse import urlsplit
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
+        self.respond(include_body=True)
+
+    def do_HEAD(self):
+        self.respond(include_body=False)
+
+    def respond(self, include_body):
         path = urlsplit(self.path).path
         if path == "/health":
             status, body = 200, b'{"status":"ok"}\n'
@@ -18,7 +24,8 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
-        self.wfile.write(body)
+        if include_body:
+            self.wfile.write(body)
 
 
 if __name__ == "__main__":
